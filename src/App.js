@@ -8,6 +8,7 @@ import './App.css'
 
 const SIDE = 6;
 const SYMBOLS = '😀🎉💖🎩🐶🐱🦄🐬🌍🌛🌞💫🍎🍌🍓🍐🍟🍿';
+const VISUAL_PAUSE_MSECS = 750;
 
 class App extends Component {
 
@@ -17,6 +18,19 @@ class App extends Component {
         guesses: 0,
         matchedCardIndices: [],
     };
+
+    handleNewPairClosedBy(index) {
+        const {cards, currentPair, guesses, matchedCardIndices} = this.state
+
+        const newPair = [currentPair[0],index]
+        const newGuesses = guesses + 1
+        const matched = cards[newPair[0]] === cards[newPair[1]]
+        this.setState({currentPair: newPair,guesses: newGuesses})
+        if (matched) {
+            this.setState({matchedCardIndices: [...matchedCardIndices,...newPair]})
+        }
+        setTimeout(() => this.setState({currentPair:[]}),VISUAL_PAUSE_MSECS)
+    }
 
     generateCards() {
         const result = [];
@@ -57,7 +71,7 @@ class App extends Component {
     render() {
         const {cards, guesses, matchedCardIndices} = this.state;
         const won = matchedCardIndices.length === cards.length;
-        return <div className="memory">
+        return (
             <div className="memory">
                 <GuessCount guesses={guesses}/>
                 {cards.map((card, index) => (
@@ -72,7 +86,7 @@ class App extends Component {
                 }
                 {won && <p><HallOfFame entries={FAKE_HOF}/> !</p>}
             </div>
-        </div>
+        )
     }
 }
 
